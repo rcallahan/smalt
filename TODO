@@ -1,0 +1,28 @@
+o SW-score neutral (i.e. sw-scor == 0) extension of alignment at edges
+
+o Smith-Waterman alignement can result in an segmented alignment. Such segments
+  are currently output in separate (e.g. SAM) output lines with the SAM FLAG bit
+  0x100, flagging 'secondary alignments', (inappropriately) set for all but the
+  highest scoring segment. Most of these alignments could be reported in one line
+  using the CIGAR 'N' operator designating a skipped segment of the reference.
+
+o Use of the '-d' option currently breaks recommendation in SAM/BAM spec that only 
+  one record per segment should have the secondary alignment flag bit (0x100) unset.
+
+o For very long reads, map in segments and stitch alignment
+  results. Alternatively, use variable alignment band width.
+
+o implement vectorised Smith-Waterman for (variable) alignment band.
+
+o implement vectorised Needleman-Wunsch.
+
+o Copy SAM/BAM header input to SAM/Bam header output.
+
+o Flags of SAM/BAM input lines are currently ignored/overwritten. For
+  example, an orphaned read of a mate pair (SAM input) will be output
+  as a single read.
+
+o Possibly change the maximum number of reference sequences allowed (currently 
+  has to fit a 32 bit signed int).
+
+o Fix annotation for doxygen. Automated build of documentation.

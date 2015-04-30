@@ -1,0 +1,9 @@
+Miscellaneous helper programs for SMALT.
+
+simread.c
+	Simulate paired-end reads from a reference genome introducing 
+	single base variations and indels.
+
+fetchFromSeqSet.c
+	Fetch a sequence segment from a sequence set. 
+	The sequence is identified by its (FASTA) name.

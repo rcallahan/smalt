@@ -1,0 +1,729 @@
+=========================
+= SMALT release history =
+=========================
+
+Release 0.7.6 (21 March 2014)
+=============================
+
+New features:
+
+- For compilation on Intel's Many Integrated Cores
+  Architecture compile with ./configure --enable-mic
+
+- Re-organised distributed tests.
+
+- Minor changes allowing to switch between 0-based and 1-based offsets
+  for debugging (tracking) and to make vectorised alignment code
+  safer.
+
+- Ammended installation instructions with the bambamc library.
+
+
+Bug fixes:
+
+- Fixed bug due to uninitialised re-used memory. This could result in
+  a flipped read orientation of a read (estimated incident rate
+  approx. 1 mate in 10^6 Illumina read pairs).
+
+- fixed bug in 'smalt map -p' resulting in the "assertion failed"
+  error message. This could occur when a read aligned across two
+  successive sequences in the reference file for which the index was
+  constructed, and none of the matching segments exceeded the
+  threshold of the Smith-Waterman alignment score (set with -m).
+
+- Fixed overcommitted memory in multi-threaded mode. The effect was
+  felt when using a large number of threads (> 16)., e.g. on intel MIC
+  cards.
+
+- Fixed broken multi-threaded exection on Mac OSX (discovered on OSX
+  10.8.5) where the program could fail with 'assertion error' or
+  silently produce incomplete output.
+
+=(smalt 0.7.6 21/03/2014 hp3)=
+
+
+Release 0.7.5 (16 July 2013)
+============================
+
+New features:
+
+- Changed buffering in multi-threaded mode to make code run more
+  efficient with a high number (>8) of threads. As a consequence,
+  the memory footprint increased compared to earlier versions.
+
+
+Bug fixes:
+
+- Fixed 'assertion failed' error that occurred with -p flag
+  and read pairs if no alignment was found for the mate with	
+  the higher number of k-mer word hits in the hash index.
+
+=(smalt 0.7.5 15/07/2013 hp3)=
+
+
+Version 0.7.4.5 (09 July 2013)
+==============================
+
+- Fixed error message 'rmap.c:2048 ERROR: unknown error code' which
+  could occur with wide insert range boundaries (e.g. -i 80000).
+
+Version 0.7.4.4 (25 June 2013)
+==============================
+
+- Fixed broken multi-threaded execution (option -n) on MacOSX (broken
+  since version 0.6.2). Program execution stopped prematurely and no
+  mappings were output. This was caused by the use of unnamed POSIX
+  semaphores (<semaphore.h>) that are not implemented on MacOSX.
+
+- Modified configure script to generate 64-bit binaries on MacOSX Darwin
+  on x86_64 architecture.
+
+
+Version 0.7.4.3 (20 June 2013)
+==============================
+
+- Fixed a bug that lead to the program terminating with a "assertion
+  failed" error message when one of the mates of a read pair had a
+  length shorter than the hashed words, but the other could be
+  aligned.
+
+
+Version 0.7.4.2 (05 June 2013)
+==============================
+
+- Removed redundant code, added test data, moved code and repository
+  to SoureForge.
+
+
+Version 0.7.4.1 (22 April 2013)
+===============================
+
+- Fixed a bug that led to alignments being missed in output generated
+  with the '-d' option. An alignment could be missed if it overlapped
+  with another, longer alignment even if that had a lower
+  Smith-Waterman score.
+
+
+Release 0.7.4 (10 April 2013)
+=============================
+
+New features:
+
+- added command line option '-S' for the specification of 
+  alignment penalty scores. 
+ 
+
+Bug fixes:
+
+- Fixed SAM input for orphan mates of read pairs.
+
+- Fixed Multiple SAM/BAM lines with the 'secondary alignment' flag
+  unset. This occurred when using the '-d' option.
+
+- Fixed spurious bug in CIGAR strings that denote mismatches by the
+  letter 'X' (e.g. with '-f smalt:x'). The read length represented by
+  the CIGAR string could be 1 bp less then the actual read length if
+  reads were mapped against > 512 reference sequences and could be
+  aligned across two successive reference sequences in the indexed
+  FASTA file. The faulty CIGAR string was issued when the read
+  alignment had a mismatch with the last base of the reference
+  sequence.
+
+=(smalt 0.7.4 10/04/2013 hp3)=
+
+
+Release 0.7.3 (15 March 2013)
+=============================
+
+New features:
+
+- Added output of CIGAR strings with 'X' for mismatch in SAM and BAM
+  output formats with options '-f sam:x', '-f bam:x'
+
+- Added 'NM' tag containing edit distance in SAM/BAM output formats to
+  comply with recommendations in SAM spec 1.4. Added @PG line to BAM
+  output.
+
+- Updated interface to bambamc library version 0.0.42
+
+Bug fixes:
+
+- Fixed broken BAM output format when reads without base qualities
+  (FASTA format) were mapped.
+
+- Fixed bug that scrambled BAM output format.
+  (output file was opened twice).
+
+- Fixed bug in BAM ouptut format for paired reads: Bit 0x20 ("SEQ of
+  the next segment in the template being reversed") of the FLAG field
+  was set according to the 1st rather than the 2nd read of the pair.
+
+- Fixed a bug when paired reads were mapped but only one of the reads
+  could be aligned with a Smith-Waterman score above the
+  threshold. The bug hat the program stopping with the error message
+  "assertion failed".
+
+- Fixed segfault with explicit alignment output (option -a) and long
+  PacBio reads.
+
+=(smalt 0.7.3 15/03/2013 hp3)=
+
+
+Release 0.7.2 (22 February 2013)
+================================
+
+New features:
+
+- Added @PG tag to SAM header.
+
+- Overhauled online help options. smalt <task> without further option
+  prints short summary of available options.
+
+- Added tests for BAM output format.
+
+
+Bug fixes:
+
+- Fixed BAM output format which was broken since 0.7.0.
+  Reference positions were off  by +1 bp. CIGAR strings
+  were incorrect. Output was silent when smalt was compiled
+  without the bambamc library.
+
+- Fixed missing SAM header for option -f 'sam' (default).
+
+- Fixed sample task bailing out with an error message when there are
+  too few confident mappings and the histogram is therefore empty. Now
+  the program finishes without error messages but he output contains
+  line 'Histogram of insert sizes is empty'.
+
+
+=(smalt 0.7.2 22/02/2013 hp3)=
+
+
+Release 0.7.1 (29 January 2013)
+===============================
+
+New features:
+
+- Adopted SAM spec 1.4 for the definition of insert sizes.
+
+- Removed the restriction that the number of reference sequences
+  has to be representable by a signed 32-bit integer. The file format
+  for the compressed set of reference sequences changed.
+
+- added support for reading gzipped FASTA/FASTQ files.
+
+Bug fixes:
+
+- Fixed inconsistent alignment (CIGAR) strings between mappings on the
+  forward strand the reference and alignments on the reverse
+  complement strand.  The CIGAR string was inconsistent e.g. for
+  indels in homo-polymer runs, where the precises alingment was
+  ambiguous.
+
+  This caused problems when calling indels naively directly from the
+  mapping output without further processing, e.g. involving multiple
+  sequence alignment of the mapped reads in such regions.
+
+- fixed broken '-p' flag for split read mapping.
+
+- Fixed broken 'class' label in cigar output format. If 
+  one of the mates was not mapped, the mapped mate was 
+  assigned the label 'D' instead of the correct 'S'. 
+
+=(smalt 0.7.1 29/01/2013 hp3)=
+
+
+Release 0.7.0.1 (05 November 2012)
+==================================
+
+- Fixed a number of bugs in verision 0.7.0 affecting indexing of and
+  mapping against contigs of an assembly. The index task crashed for
+  contigs and hits on the reverse complement strand were not correctly
+  collated.
+
+- Fixed crashing check task.
+
+- Progress reports are sent to stderr rather than previously stdout.
+
+=(smalt 0.7.0.1 05/11/2012 hp3)=
+
+
+Release 0.7.0 (18 October 2012 - withdrawn on 26/10/12)
+=======================================================
+ 
+- added support for reading SAM/BAM files (using German
+  Tischler's bambam libary and samtools). Added -F option to
+  specify input formats.
+
+- Changed default behaviour: Where reads or read pairs have multiple
+  equivalent mappings a location is picked at random (as with the
+  option '-r 0'). The default output format is now SAM using soft
+  clipping. Output written to a file (option -o) in SAM format
+  contains the header.
+
+- The option '-r -1' switches off random picking. Reads (pairs) with 
+  multiple equivalent mappings are reported as 'not mapped'.
+
+- When mapping paired reads, option '-d 0' now reports all possible
+  top ranking pairings.
+
+- Alignments can now be output in BAM format (option '-f bam'). The
+  format specification for sam output can be extended by optional
+  keywords, e.g. '-f sam:nohead,clip' will omit the header and output
+  hard clipped read sequences.
+
+=(smalt 0.7.0 18/10/2012 hp3)=
+
+
+Release 0.6.4 (25 September 2012)
+=================================
+
+- fixed a bug in SAM output format for paired reads. The 'inferred
+  insert size' (field 9, ISIZE) was always set to 0 in version 0.6.3.
+
+- fixed broken -a option. Progam bailed out with error message
+  "assertion failed" when an unmapped read was encountered.
+
+=(smalt 0.6.4 25/09/2012 hp3)= 
+
+
+Release 0.6.3 (1 August 2012)
+=============================
+
+- Added '-O' flag which preserves the order of the reads in the input
+  files for the output when using multiple threads ('-n' option).
+
+- Added GFF2 (Generic Feature Format, version 2) output format with the 
+  option '-f gff'.
+
+- Mapping with the option '-d 0' now outputs all possible mappings of
+  single reads with the best Smith-Waterman score. This option
+  overrides the '-r' option which triggers output of a single mapping
+  picked at random.
+
+- Reduced memory footprint for multi-theaded mapping (option -n).
+
+- Reduced the memory footprint when mapping paired reads with
+  very long insert sizes (> 100k pb).
+
+- Fixed '-q' option which was not recognised for the 'map' task
+  resulting in the error message 'unknown option -q'.
+
+- Fixed a bug in the explicit alignment output (-a option). The
+  alignment was scrambled for reads which aligned as the reverse
+  complement to the reference.
+
+- Fixed a bug in the ouptput of multiple mappings with identical
+  Smith-Waterman scores. Multiple mappings were output even when one of
+  those mappings with identical Smith-Waterman scores had a higher
+  mapping quality than the rest. This happened when single reads were
+  mapped without the '-d' option specified
+
+=(smalt 0.6.3 01/08/2012 hp3)=
+
+Release 0.6.2 (21 May 2012)
+===========================
+
+- Fixed long-standing efficiency issues with multi-threaded execution
+  (-n option). The maximum number of additional threads that can be
+  forked is now 64 (used to be limited to 8).  
+  
+  WARNING: The order of the reads in the input files is no longer
+  preserved for the output. Mappings for read pairs are still output
+  in sucessive lines, though.
+
+- Fixed broken 'sample' task. Program would stop with the message
+  'command line format error'.
+
+- Fixed a bug affecting mapping to scaffolds. The bug could result in
+  missing partial alignments or stop of program execution with the
+  error message "ERROR: assertion failed".
+
+=(smalt 0.6.2 21/05/2012 hp3)=
+
+
+Release 0.6.1 (3 April 2012)
+============================
+
+- Corrected reading of hash-index files which was broken in version
+  0.6.0. The 'map' task halted with the error message 'error in file
+  format' for index files created with certain combinations of k-mer
+  lengths and sampling steps by the 'index' task. The error depended
+  also on the total length of reference sequences.
+
+- Corrected 'check' task completing with 'end of file' error on
+  flawless input files.
+
+=(smalt 0.6.1 03/04/2012 hp3)=
+
+
+Release 0.6.0 (20 March 2012)
+=============================
+
+- Added 'check' and 'sample' tasks. Added '-g' option to the map task
+  for using insertion distribution generated with the 'sample' task.
+
+- Ouput in SAM format now includes header lines.
+
+- Fixed '-p' flag for partial mapping of reads which was broken for
+  single reads.
+
+- Fixed 'assertion failed' error when attempting to map a read pair
+  where the sequences of both mates are shorter than the length k of
+  the k-mer words of the index.
+
+=(smalt 0.6.0 20/03/2012 hp3)=
+
+
+Release 0.5.8 (11 November 2011)
+================================
+
+- Added the option '-l pp' for paired read libraries where both
+  mates are sequenced on the same strand (e.g. 454 libraries)>
+
+- Fixed segmentation fault error that could occur when multi-threading 
+  ('-n' option).
+
+- Fixed a segmentation fault error when the hash index file could not
+  be found.
+
+- Fixed program stopping prematurely with the error message 'Overflow
+  of Smith-Waterman score' that could occur when aligning very long
+  sequences (> 65536 bp).
+
+=(smalt 0.5.8 11/11/2011 hp3)=
+
+
+Release 0.5.7 (13 Sept 2011)
+============================
+
+- Introduced the 'R' label in SSAHA2 and CIGAR output formats obtained
+  without the '-r' option for reads that cannot be placed
+  unambiguously and until now were labelled 'N'. The label 'N' is now
+  restricted to reads for which no mapping location can be found.
+
+- Fixed a bug in the output of paired reads where one mate maps to
+  multiple locations and the other mate can be mapped
+  unambigously. When mapping without the '-r' option, the unambiguous
+  mate was reported as 'unmapped'. 
+
+- Corrected mapping scores for paired reads which have were too
+  conservative (from version 0.5.4 onwards).
+
+- Fixed a problem that occurred when there were more than 512
+  reference sequences in the index. The program could terminate with
+  the error message 'failure' if it encountered reads that had a long
+  sequence of nucleotides of unknown type (Ns) and their ends had
+  (spurious) alignments with reference sequences.
+
+=(smalt 0.5.7 13/09/2011 hp3)=
+
+
+Release 0.5.6 (2 Sept 2011)
+===========================
+
+- Added '-l' option specifying the type of read pair library used.
+  By default it is assumed that reads were produced by the illumina
+  paired-end (short insert) library protocol.
+
+- Fixed a bug that caused an unnessecary large number of alignments to
+  be carried out for long reads (>~1000 bp). This resulted in 3x speed up
+  for long PacBio reads. The sensitivity was also improved.
+
+=(smalt 0.5.6 02/09/2011 hp3)=
+
+
+Release 0.5.5 (5 July 2011)
+===========================
+
+- Fixed core dump that cold occur with read pairs when only a single
+  pair was detected wher one mate had a mapping quality score of 0.
+
+=(smalt 0.5.5 05/07/2011 hp3)=
+
+
+Release 0.5.4 (1 July 2011)
+===========================
+
+- Fixed bug in SAM output for mate pairs present in version 0.5.3
+  where the insert size was set to 0.
+
+- The '-c' option an now no longer be used unless the '-x' flag is
+  also set. It interferes with the heuristics used to filter
+  potentially matching segments.
+
+- Fixed a bug introduced with verision 0.5.2 where, on rare occasions
+  program execution would stop with the error message 'sequence too
+  short to be hashed'.
+
+- Better calibration of mapping quality scores for paired reads.
+
+=(smalt 0.5.4 01/07/2011 hp3)=
+
+
+Release 0.5.3 (8 June 2011)
+===========================
+ 
+- New calibration of mapping scores of paired reads. Mapping scores
+  take into account the orientation of the mapped mates. SMALT expects
+  paired reads as input as they result from the Illumina paired-end
+  (PE) library for short insert lengths (gaps). Reads from Illumina
+  mate-pair (MP) libraries with long insert lengths would have to be
+  converted to PE format to ensure correct scoring. The same holds for
+  paired reads from other sequencing platforms.
+  
+- Improved sensitivity and accuracy of paired reads at somewhat (~20%)
+  decreased speed.
+
+- Output of multi-threaded execution (option '-n') now preserves the
+  order of the reads in the input file.
+
+- Fixed a problem with 'mapping category' labels for paired reads in
+  CIGAR format.  One of the mates of a pair mapped not in the expected
+  orientation could be wrongly labelled as the mate of a 'proper' pair
+  ('A' rather than 'C').
+
+- Fixed 'Smith-Waterman score overflow' error that occurred with
+  sequences > 255 bp on MacOSX.
+
+=(smalt 0.5.3 08/06/2011 hp3)=
+
+
+Release 0.5.2 (28 March 2011)
+=============================
+
+- Fixed '-r' option for the random picking of on of a set of
+  multiple best mappings (broken in version 0.5.1).
+
+- Increased accuracy for paired-end reads.
+
+=(smalt 0.5.2 28/03/2011 hp3)=
+
+
+Release 0.5.1 (04 March 2011)
+=============================
+
+- introduced '-y' option for a threshold in the minimum number of
+  identical nucleotides.
+
+- Extended SSAHA2 output format (option -f ssaha2) by one field
+  specifying the length of the reference sequence to which the read is
+  aligned.
+
+- Changed the parameters for the default paired-read mapping
+  strategy. As before, the read with the fewer k-mer hits is aligned
+  first. If the mapping quality score is above a certain threshold
+  (10), the mate is aligned in a restricted zone around the
+  first. Otherwise the mate is aligned indepentently. In this version,
+  the insert size distribution is not taken into account for the
+  mapping quality or paired reads.
+
+- repaired broken '-p' flag. In the sam output format, the second
+  partial alignment now has the 'secondary alignment' bit-flag (0x100)
+  of the FLAG field set. In cigar and ssaha output formats such an
+  alignment is labelled with 'P'.
+
+- Fixed a few issues with the -m option which was broken, e.g. for '-d
+  0' (default).
+
+- -f 'samsoft' was broken for unmapped reads when input files where in
+  FASTA rather than in FASTQ format. In this case the field with the
+  quality strings was missing in the SAM line.
+
+- Fixed error message ('assertion failed') with FASTA query sequences
+  (query sequence without base qualities)
+
+- Fixed error message ('assertion failed') with certain combinations
+  of -k and -s parameters when indexing.
+
+=(smalt 0.5.1 04/03/2011 hp3)=
+
+
+Release 0.5.0 (25 January 2011)
+===============================
+
+New features:
+
+- New -r option picks at random one of a set of multiple best
+  mappings. This is only active in paired-end mode or if '-d 0' is
+  used (the default).
+
+- New -q option sets a threshold of the base qualities. K-mer words
+  with nucleotides that have a base quality below this threshold are
+  not looked up in the hash index.
+
+- The -m option now specifies a 'hard' absolute threshold of the
+  Smith- Waterman (SW) score. If the score of the best alignment of a
+  reads falls below the threshold, the read is reported as 'not
+  mapped'. Previous versions always reported alignments with the
+  overall best SW score even if that score was below the threshold set
+  with -m ('soft' threshold).
+
+Bug fixes:
+
+- Fixed 'integer overflow' error that could occur when the total length
+  of concatenated reference sequences exceeded 2^32 bp and the number of
+  reference sequences exceeded 512.
+
+- Fixed a memory leak with long query sequences (> 1024 nucleotides).
+
+- Fixed a problem with the alignment of very short reads: Program
+  execution stopped with the error message "Assertion failed" if the
+  read length was less than k + 2*s, where s is the sampling step and
+  k the length (indexing parameters '-k' and '-s') of the hashed kmer
+  words.
+   
+=(smalt 0.5.0 25/01/2011 hp3)=
+
+
+Release 0.4.3 (17 December 2010)
+================================
+
+- Fixed a problem with unreliable spurious alignments in version 0.4.2. 
+  Now the minimum length of aligned read segments is given by the sum
+  of the legth of the hashed kmer words and the sampling step size 
+  (indexing parameters '-k' and '-s').
+
+- Fixed a bug with paired reads and an index generated with -s 1 that
+  could result in the program stopping with the error "assertion
+  failed". This was caused by an integer overflow during the
+  calculation of candidate locations for the 2nd aligned mate.
+
+- Fixed 1-nucleotide glitches in the length of the aligned segments of
+  the query read (or the CIGAR string). This was a rare event
+  that could happen when mapping against a large number of contigs.
+
+=(smalt 0.4.3 17/12/2010 hp3)=
+
+
+Release 0.4.2 (9 December 2010)
+===============================
+
+- Reduced memory footprint for compression of sequences
+  while indexing.
+
+- The format of the sequence file (extension *.sma) has changed.
+  Reading of the sequence file is backwards compatible with versions
+  0.3.x.
+
+- SAM ouput now has the '/1' and '/2' suffices stripped from the read
+  names of paired reads (indicate the order of mates). 
+
+  Read names are otherwise not checked by SMALT. This means the
+  program won't detect whether the two FASTQ input files (READ_FILE
+  and MATE_FILE), which contain the reads of 1st and 2nd mate, were
+  swapped. Neither will the program detect whether or not the two
+  input files are 'in-sync', i.e. whether the i-th read in READ_FILE
+  corresponds to (is the mate of) the i-th read in MATE_FILE. Two
+  files could be 'out-of-sync' e.g. because one of the files has an
+  additional single read erroneously inserted.
+
+- Output lines printed to standard output are now preceded by a hash
+  ('#') if they contain progress reports by the program. This is so
+  they easily can be parsed out when alignment coordinates are piped
+  to standard output rather than written to a file (with the option
+  '-o').
+
+- Fixed core dump that occured when indexing reference sequences with a
+  total number of nucleotides exceeding 2^32.
+
+- Fixed core dump occuring with ssaha output format ('-f ssaha' flag).
+
+=(smalt 0.4.2 09/12/2010 hp3)=
+
+
+Release 0.4.1 (10 November 2010)
+===============================
+
+- Accelerated mapping speeds particularly for long (> 500 nt) reads.
+
+- Re-calibrated mapping quality scores for 100bp Illumina reads of the
+  human genome.
+
+- Changed the default minimum score (19) to <wordlen> + nskip - 1.
+
+- Fixed the '-w' option which was broken in versions 0.3.x
+
+- Fixed a number of bugs due to unitialised memory. Premature stop of
+  execution with error messages or core dumps could occur in
+  multi-thread mode (-n) or with the option '-d -1' when aligning
+  sequences >~ 1000 nt in length.
+
+=(smalt 0.4.1 10/11/2010 hp3)=
+
+
+Release 0.4.0 (14 October 2010)
+===============================
+
+- Implemented support for k-mer words of up to 20 nucleotides and
+  reduced the memory and disk footprint of the hash index for smaller
+  genomes. The memory required for the construction of the hash index
+  was also reduced.
+
+- The file format for the index (file name extension *.smi)
+  changed. Reading of hash indices is backward compatible with
+  versions 0.3.x.
+
+- Increased speeds for Sanger capillary reads more than 5-fold over
+  versions 0.3.x.
+
+- Fixed a bug in version 0.3.2 that occasionally resulted in the
+  program exiting with error messages when the number of reference
+  sequences exceeded 256. The bug was limited to query sequences
+  (reads) aligning across two reference sequences adjacent in the
+  FASTA file from which the hash index was built.
+
+- Fixed a bug in version 0.3.2 which affected the way paired read
+  alignments with multiple best mappings were output with the -d 0
+  (default) option. Such read pairs should be reported as unmapped,
+  but the bug occasionally caused one of the mates being reported as
+  mapped to one of the possible locations with a mapping quality of 1.
+
+=(smalt 0.4.0 14/10/2010 hp3)=
+
+
+Release 0.3.2 (24 August 2010)
+==============================
+
+- Fixed broken alignment coordinates when reads aligned across two or
+  more successive sequences in the FASTA file of reference sequences.
+  This bug occurred when the hash index was constructed for more than
+  256 reference sequences.
+  
+- Fixed broken offsets of aligned segments of the query read which
+  occurred predominantly with capillary and 454 reads.
+
+=(smalt 0.3.2 24/08/2010 hp3)=
+
+
+Release 0.3.1 (23 July 2010)
+============================
+
+- Fixed an error message "assertion failed" that occurred with query
+  reads with degenerate hits (multiple best hits) if the base call
+  qualities where missing (input in FASTA rather than FASTQ format).
+
+- Fixed an error message "could not open file" that occurred in
+  multi-threaded mode with the '-o <output file>' option.
+
+- Fixed a racing condition in multi-threaded mode. The maximum number
+  of threads for the '-n' option was set to 8.
+
+- Changed the way degenerate hits are output when single reads are
+  mapped with the -d 0 (default) option: reads with degenerate hits
+  are output as 'unmapped' unless -d <swdiff> with swdiff != 0 is
+  used. E.g. -d 1 will output all mapped locations with the same best
+  Smith-Waterman score.
+
+=(smalt 0.3.1 23/07/2010 hp3)=
+
+
+Release 0.3 (06 July 2010)
+============================
+
+- First public release of pre-compiled binaries
+
+=(smalt 0.3 06/07/2010 hp3)=
+
+

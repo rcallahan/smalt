@@ -1,0 +1,73 @@
+SMALT aligns DNA sequencing reads with a reference genome.  
+
+
+Supported Sequencing Platforms
+==============================
+Reads from a wide range of sequencing platforms can be processed, for
+example Illumina, Roche-454, Ion Torrent, PacBio or ABI-Sanger. Paired
+reads are supported. There is no support for SOLiD reads.
+
+
+Strategy
+========
+The software employs a hash index of short words of up to 20
+nucleotides sampled at equidistant steps along the reference genome.
+For each sequencing read, potentially matching segments in the
+reference genome are identified from seed matches in the index and
+subsequently aligned with the read using dynamic programming.
+
+
+Documentation
+=============
+http://www.sanger.ac.uk/resources/software/smalt/
+
+
+Installation
+============
+./configure
+make
+make install
+
+
+Installation on MacOSX (Darwin)
+===============================
+You might get 32-bit binaries by default with MacOSX Darwin on a 64-bit machine.
+In this case use (from version smalt 0.7.4.4)
+./configure --build=x86_64-apple-darwin
+or
+./configure --build=x86_64-apple-darwin --with-bambamc=no
+
+
+Optional Prerequisites
+======================
+
+If you would like to use SAM/BAM as input or BAM as ouput file format,
+download and install the bambamc library from GitHub 
+https://github.com/gt1/bambamc
+Without this library, SMALT expects (possibly gzipped) FASTA/FASTQ
+files as input.
+
+
+Installation with the bambamc library
+=====================================
+
+Download the source code for the bambamc library, e.g. as zip file
+bambam-master.zip for the library from
+https://github.com/gt1/bambamc. To install the bambamc library you
+should have the GNU autoconf tools installed
+[http://www.gnu.org/software/autoconf].
+
+The installation generates a metadata file bambamc.pc for the
+pkg-config tool [http://www.freedesktop.org/wiki/Software/pkg-config]
+in the directory $BAMBAMC_INSTALL_DIR/lib/pkgconfig. You may
+have to add this directory to the (colon separated) list of paths in
+the environment variable PKG_CONFIG_DIR.
+
+The configure script for SMALT uses the pkg-config tool by default to
+link the bambamc library. Alternatively, use the ./configure options
+
+./configure --with-bambamc=yes BAMBAMC_CFLAGS="-I$BAMBAMC_INSTALL_DIR/include" BAMBAMC_LIBS="-L$BAMBAMC_INSTALL_DIR/lib -lbambamc"
+
+
+
+
